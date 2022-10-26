@@ -125,13 +125,22 @@ def gitconfig_set(name, value, file=None):
 class GitFat(object):
     DecodeError = RuntimeError
     def __init__(self):
-        self.verbose = verbose_stderr if os.environ.get('GIT_FAT_VERBOSE') else verbose_ignore
+        #self.verbose = verbose_stderr if os.environ.get('GIT_FAT_VERBOSE') else verbose_ignore
         try:
             self.gitroot = subprocess.check_output('git rev-parse --show-toplevel'.split()).strip()
         except subprocess.CalledProcessError:
             sys.exit(1)
         self.gitdir = subprocess.check_output('git rev-parse --git-dir'.split()).strip()
         self.objdir = os.path.join(self.gitdir, 'fat', 'objects')
+        
+        self.cfgpath   = os.path.join(self.gitroot, b'.gitfat')
+        #check if the verbose flag is set in the config file as opposed to OS environment
+            #set as:
+            #   [Flags]
+            #   verbose=True
+
+        self.verbose = verbose_stderr if gitconfig_get('flags.verbose',file=self.cfgpath) else verbose_ignore
+        
         if os.environ.get('GIT_FAT_VERSION') == '1':
             self.encode = self.encode_v1
         else:
@@ -166,6 +175,14 @@ class GitFat(object):
             self.verbose('Pulling from %s' % (remote))
 
         cmd = ['rsync', '--progress', '--ignore-existing', '--from0', '--files-from=-']
+        #check if we are running windows
+        if sys.platform == "win32":
+            # if we are prepend wsl to route everything through the windows subsystem for linux
+            cmd.insert(0,b'wsl')
+            #rsync seems more touchy with slash directions so enforce the unix convention
+            objdir = self.objdir.decode('ascii').replace("\\","/")
+            objdir = objdir.encode('ascii') #convert back to binary obj
+        
         rshopts = ''
         if ssh_user:
             rshopts += ' -l ' + ssh_user
@@ -498,6 +515,11 @@ class GitFat(object):
         else:
             gitconfig_set('filter.fat.clean', 'git-fat filter-clean')
             gitconfig_set('filter.fat.smudge', 'git-fat filter-smudge')
+            if not os.path.exists(self.cfgpath):
+                FILE = open(self.cfgpath,'w')
+                content = "[rsync]\nremote = \n\n[flags]\nverbose=False"
+                FILE.write(content)
+                FILE.close()
             print('Initialized git fat')
     def gen_large_blobs(self, revs, threshsize):
         """Build dict of all blobs"""
