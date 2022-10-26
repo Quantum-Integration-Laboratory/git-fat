@@ -17,15 +17,23 @@ Some people recommend checking binaries into different repositories or even not 
 * [git-media](https://github.com/schacon/git-media) adopts a similar approach to `git-fat`, but with a different synchronization philosophy and with many Ruby dependencies.
 
 # Installation and configuration
-Place `git-fat` in your `PATH`.
+
+## Requirements
+* WLS
+    * In order to use rsync as remote method, we need to be able to run unix commands. (Note anyone on mac will need to confirm if this is just linux). On windows my work around is to just run all these commands through the [windows subsystem for linux](https://learn.microsoft.com/en-us/windows/wsl/install) (WSL).
+    * Install is fairly simple just run `wsl --install` in a windows powershell.
+* Python 3.x
+
+## Installation
+Place `git-fat` in your `Python3x/Scripts` which should already be added to your `PATH`. Ideally will be a package at somepoint.
+
+## Usage
 
 Edit `.gitattributes` to regard any desired extensions as fat files.
 
-    $ cat >> .gitattributes
     *.png filter=fat -crlf
     *.jpg filter=fat -crlf
     *.gz  filter=fat -crlf
-    ^D
 
 Run `git fat init` to active the extension. Now add and commit as usual.
 Matched files will be transparently stored externally, but will appear
@@ -44,10 +52,11 @@ remote ssh in a directory with shared access.
 # A worked example
 
 Before we start, let's turn on verbose reporting so we can see what's
-happening. Without this environment variable, all the output lines
-starting with `git-fat` will not be shown.
+happening. Without this variable, all the output lines
+starting with `git-fat` will not be shown. In `.gitfat` change
+    [flags]
+    verbose=True
 
-    $ export GIT_FAT_VERBOSE=1
 
 First, we create a repository and configure it for use with `git-fat`.
 
