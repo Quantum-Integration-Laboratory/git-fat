@@ -2,3 +2,7 @@
 fat-test/
 fat-test2/
 retro/
+build/*
+dist/*
+*.egg*
+__pycache__
