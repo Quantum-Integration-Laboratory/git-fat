@@ -25,7 +25,9 @@ Some people recommend checking binaries into different repositories or even not 
 * Python 3.x
 
 ## Installation
-Place `git-fat` in your `Python3x/Scripts` which should already be added to your `PATH`. Ideally will be a package at somepoint.
+Clone this repository to some location. From the cloned location run:
+ `pip install .`
+
 
 ## Usage
 
