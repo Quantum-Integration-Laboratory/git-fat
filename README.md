@@ -1,3 +1,21 @@
+# QIL notes:
+In our most common usecase our remote will likely be some local computer running linux, for each project it is recommended to select a backup location in this device. In `.gitfat` then set the remote to be
+
+    [rsync]
+    remote = <hostname>:<path>
+    sshuser = name
+
+Due to routing things through WSL and the difficulty with dealing with passwords it is likely better to set up each pushing computer as an ssh authorised key on the server.
+
+On windows assuming usual ssh install open a powershell 
+    
+	type $env:USERPROFILE\.ssh\id_rsa.pub | ssh <user>@<hostname> "cat >> .ssh/authorized_keys"
+
+This must then be share with the WSL instance
+
+    wsl sudo cp -r /mnt/c/Users/<User>/.ssh ~/
+
+
 # Introduction
 Checking large binary files into a source repository (Git or otherwise) is a bad idea because repository size quickly becomes unreasonable.
 Even if the instantaneous working tree stays manageable, preserving repository integrity requires all binary files in the entire project history, which given the typically poor compression of binary diffs, implies that the repository size will become impractically large.
@@ -56,6 +74,7 @@ remote ssh in a directory with shared access.
 Before we start, let's turn on verbose reporting so we can see what's
 happening. Without this variable, all the output lines
 starting with `git-fat` will not be shown. In `.gitfat` change
+
     [flags]
     verbose=True
 

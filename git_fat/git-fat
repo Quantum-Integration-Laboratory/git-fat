@@ -400,7 +400,7 @@ class GitFat(object):
         
             if not os.path.exists(self.cfgpath):
                 FILE = open(self.cfgpath,'w')
-                content = "[rsync]\nremote = \n\n[flags]\nverbose=False"
+                content = "[rsync]\nremote = \n\n[flags]\nverbose=False\nversion=2"
                 FILE.write(content)
                 FILE.close()
             
